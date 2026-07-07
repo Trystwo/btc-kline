@@ -12,18 +12,11 @@ from urllib.error import URLError
 
 DEEPSEEK_API = "https://api.deepseek.com/chat/completions"
 DEFAULT_CSV = "btc_weekly_klines.csv"
+PROMPT_FILE = "prompt_kline_analysis.md"
 
-SYSTEM_PROMPT = """你是资深加密货币技术分析师，精通 K 线技术分析。
-根据用户提供的 BTC/USDT 周线 OHLCV 数据，给出专业分析。
-
-分析内容包括：
-1. **整体趋势判断** — 最近几周的走势方向、力度
-2. **关键支撑位与阻力位** — 明显的价格区间
-3. **成交量分析** — 放量/缩量区域及其含义
-4. **技术形态** — 识别可能的 K 线组合形态（如头肩顶、双底、旗形等）
-5. **后市展望** — 基于以上分析的短期走势预判
-
-请用中文输出，简明专业。"""
+def load_prompt(path=PROMPT_FILE):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read().strip()
 
 
 def read_csv(path):
@@ -71,13 +64,13 @@ def main():
     try:
         header, rows = read_csv(csv_path)
     except FileNotFoundError:
-        print(f"❌ 找不到文件: {csv_path}，请先运行 fetch_btc_weekly.py")
+        print(f"❌ 找不到文件: {csv_path} 或提示词文件 {PROMPT_FILE}，请先运行 fetch_btc_weekly.py")
         sys.exit(1)
 
     print(f"📊 读取 {len(rows)} 根周 K 线，正在调用 DeepSeek 分析...\n")
 
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": load_prompt()},
         {"role": "user", "content": build_prompt(header, rows)},
     ]
 
