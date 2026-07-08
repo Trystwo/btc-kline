@@ -1,2 +1,13 @@
-*.json
-*.csv
+# 数据文件（自动生成）
+data/*.json
+data/*.csv
+
+# 请求存档（自动生成）
+requests/*.json
+
+# 分析报告（自动生成）
+reports/*.md
+
+# 系统文件
+.DS_Store
+*.swp
